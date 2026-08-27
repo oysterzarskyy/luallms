@@ -5,13 +5,13 @@
 
 --!strict
 local Brain = require(script.brain)
-local Agsetol = require(script.agsetol) 
+local AgentSearch = require(script.agentsearch) -- Requiring the renamed module file
 
 local LuaLLMs = {}
 
 -- expose constructors to user scripts
 LuaLLMs.CreateBrain = Brain.new
-LuaLLMs.LoadSearchAgent = Agsetol.new 
+LuaLLMs.LoadSearchAgent = AgentSearch.new 
 
 print("[luallms] initialized, running lullzm-coder:mini.gentle")
 return LuaLLMs
