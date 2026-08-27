@@ -13,5 +13,5 @@ local LuaLLMs = {}
 LuaLLMs.CreateBrain = Brain.new
 LuaLLMs.LoadSearchAgent = Agsetol.new 
 
-print("[luallms] initialized")
+print("[luallms] initialized, running lullzm-coder:mini.gentle")
 return LuaLLMs
