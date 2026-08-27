@@ -1,0 +1,11 @@
+{
+  "name": "Lullmz",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Lullmz": {
+        "$path": "src"
+      }
+    }
+  }
+}
