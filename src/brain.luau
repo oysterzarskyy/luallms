@@ -1,7 +1,6 @@
 --[[
-    lullmz brain thing - i wrote this because standard neural nets are too slow
-    pray that Luau native codegen actually speeds this up lmao
-    - oystah
+    luallms - brain engine logic
+    github: oystah/luallms
 ]]
 
 --!strict
@@ -10,7 +9,6 @@
 local Brain = {}
 Brain.__index = Brain
 
--- types for the strict compiler so it stops yelling at me
 export type Matrix = { {number} }
 export type LayerStructure = { number }
 
@@ -21,17 +19,14 @@ type BrainInstance = {
 	learningRate: number,
 }
 
--- generic sigmoid, good enough for now
 local function sigmoid(x: number): number
 	return 1 / (1 + math.exp(-x))
 end
 
--- gradient helper for backprop
 local function sigmoidDerivative(y: number): number
 	return y * (1 - y)
 end
 
--- constructor
 function Brain.new(structure: LayerStructure, learningRate: number?): BrainInstance
 	local self = setmetatable({}, Brain) :: any
 	
@@ -40,7 +35,6 @@ function Brain.new(structure: LayerStructure, learningRate: number?): BrainInsta
 	self.weights = {}
 	self.biases = {}
 	
-	-- slap random small numbers everywhere to initialize
 	for i = 1, #structure - 1 do
 		local rows = structure[i + 1]
 		local cols = structure[i]
@@ -51,8 +45,7 @@ function Brain.new(structure: LayerStructure, learningRate: number?): BrainInsta
 		for r = 1, rows do
 			layerWeights[r] = {}
 			for c = 1, cols do
-				-- range -1 to 1, hopefully avoids exploding gradients
-				layerWeights[r][c] = math.random() * 2 - 1 
+				layerWeights[r][c] = math.random() * 2 - 1
 			end
 			layerBiases[r] = math.random() * 2 - 1
 		end
@@ -64,7 +57,6 @@ function Brain.new(structure: LayerStructure, learningRate: number?): BrainInsta
 	return self
 end
 
--- feedforward loop
 function Brain:Forward(inputs: {number}): {number}
 	local currentOutputs = table.clone(inputs)
 	
@@ -85,9 +77,7 @@ function Brain:Forward(inputs: {number}): {number}
 	return currentOutputs
 end
 
--- the agonizing math part
 function Brain:Train(inputs: {number}, targets: {number})
-	-- 1. copy-pasted the forward pass here because we need history for backprop
 	local layerOutputs: { {number} } = { table.clone(inputs) }
 	local currentOutputs = table.clone(inputs)
 	
@@ -106,7 +96,6 @@ function Brain:Train(inputs: {number}, targets: {number})
 		table.insert(layerOutputs, table.clone(currentOutputs))
 	end
 	
-	-- 2. find out how wrong the prediction was
 	local currentErrors: {number} = {}
 	local finalOutputs = layerOutputs[#layerOutputs]
 	
@@ -114,7 +103,6 @@ function Brain:Train(inputs: {number}, targets: {number})
 		currentErrors[i] = targets[i] - finalOutputs[i]
 	end
 	
-	-- loop backwards through layers, don't mess up the indices
 	for layerIdx = #self.weights, 1, -1 do
 		local layerWeights = self.weights[layerIdx]
 		local outputs = layerOutputs[layerIdx + 1]
@@ -126,7 +114,6 @@ function Brain:Train(inputs: {number}, targets: {number})
 		end
 		
 		for r = 1, #layerWeights do
-			-- actual calculus. do not touch or everything breaks
 			local gradient = currentErrors[r] * sigmoidDerivative(outputs[r]) * self.learningRate
 			self.biases[layerIdx][r] += gradient
 			
